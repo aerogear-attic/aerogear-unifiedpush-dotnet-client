@@ -15,12 +15,12 @@ namespace AeroGear
             this.httpClient = httpClient;
         }
 
-        public void Send(UnifiedMessage message)
+        public async Task Send(UnifiedMessage message)
         {
-            Send(message, null);
+            await Send(message, null);
         }
 
-        public async void Send(UnifiedMessage message, MessageResponseCallback callback)
+        public async Task Send(UnifiedMessage message, MessageResponseCallback callback)
         {
             httpClient.setUsernamePassword(message.pushApplicationId, message.masterSecret);
             try
@@ -37,12 +37,16 @@ namespace AeroGear
                 {
                     callback.OnError(e);
                 }
+                else
+                {
+                    throw e;
+                }
             }
             
         }
     }
 
-    class Builder
+    public class Builder
     {
         public Uri endpoint {get; set;}
 
@@ -51,12 +55,12 @@ namespace AeroGear
             this.endpoint = endpoint;
         }
 
-        static Builder Endpoint(Uri endpoint)
+        public static Builder Endpoint(Uri endpoint)
         {
             return new Builder(endpoint);
         }
 
-        static Builder Endpoint(string endpoint)
+        public static Builder Endpoint(string endpoint)
         {
             if (String.IsNullOrEmpty(endpoint))
             {
@@ -65,7 +69,7 @@ namespace AeroGear
             return new Builder(new Uri(endpoint.EndsWith("/") ? endpoint : endpoint + "/"));
         }
 
-        SenderClient build()
+        public SenderClient build()
         {
             return new SenderClient(new UPSHttpClient(endpoint));
         }

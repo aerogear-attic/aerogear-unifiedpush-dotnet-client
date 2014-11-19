@@ -8,7 +8,7 @@ namespace AeroGear
 {
     interface Sender
     {
-        void Send(UnifiedMessage message, MessageResponseCallback callback);
-        void Send(UnifiedMessage message);
+        Task Send(UnifiedMessage message, MessageResponseCallback callback);
+        Task Send(UnifiedMessage message);
     }
 }
