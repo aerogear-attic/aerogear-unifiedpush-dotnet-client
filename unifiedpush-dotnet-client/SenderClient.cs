@@ -17,32 +17,8 @@ namespace AeroGear
 
         public async Task Send(UnifiedMessage message)
         {
-            await Send(message, null);
-        }
-
-        public async Task Send(UnifiedMessage message, MessageResponseCallback callback)
-        {
             httpClient.setUsernamePassword(message.pushApplicationId, message.masterSecret);
-            try
-            {
-                HttpStatusCode status = await httpClient.Send(message);
-                if (callback != null)
-                {
-                    callback.OnComplete((int) status);
-                }
-            }
-            catch (Exception e)
-            {
-                if (callback != null)
-                {
-                    callback.OnError(e);
-                }
-                else
-                {
-                    throw e;
-                }
-            }
-            
+            await httpClient.Send(message);
         }
     }
 

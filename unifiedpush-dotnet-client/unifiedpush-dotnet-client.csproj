@@ -46,7 +46,6 @@
   <ItemGroup>
     <Compile Include="HttpClient.cs" />
     <Compile Include="JsonHelper.cs" />
-    <Compile Include="MessageReponseCallback.cs" />
     <Compile Include="Sender.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SenderClient.cs" />
