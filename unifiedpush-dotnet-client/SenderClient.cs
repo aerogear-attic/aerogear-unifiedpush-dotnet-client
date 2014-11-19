@@ -17,7 +17,6 @@ namespace AeroGear
 
         public async Task Send(UnifiedMessage message)
         {
-            httpClient.setUsernamePassword(message.pushApplicationId, message.masterSecret);
             await httpClient.Send(message);
         }
     }
@@ -25,6 +24,8 @@ namespace AeroGear
     public class Builder
     {
         public Uri endpoint {get; set;}
+        public string pushApplicationId { get; set; }
+        public string masterSecret { get; set; }
 
         public Builder(Uri endpoint)
         {
@@ -45,9 +46,21 @@ namespace AeroGear
             return new Builder(new Uri(endpoint.EndsWith("/") ? endpoint : endpoint + "/"));
         }
 
+        public Builder setPushApplicationId(string pushApplicationId)
+        {
+            this.pushApplicationId = pushApplicationId;
+            return this;
+        }
+
+        public Builder setMasterSecret(string masterSecret)
+        {
+            this.masterSecret = masterSecret;
+            return this;
+        }
+
         public SenderClient build()
         {
-            return new SenderClient(new UPSHttpClient(endpoint));
+            return new SenderClient(new UPSHttpClient(endpoint, pushApplicationId, masterSecret));
         }
     }
 }

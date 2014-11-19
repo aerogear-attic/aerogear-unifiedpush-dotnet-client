@@ -21,8 +21,6 @@ namespace AeroGear
         public Criteria criteria { get; set; }
         [DataMember]
         public Config config { get; set; }
-        public string pushApplicationId { get; set; }
-        public string masterSecret { get; set; }
 
         public string Serialize()
         {

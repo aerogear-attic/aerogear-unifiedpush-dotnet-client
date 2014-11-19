@@ -15,8 +15,6 @@ namespace tests
             var mock = new Mock<HttpClient>();
             UnifiedMessage unifiedMessage = new UnifiedMessage();
             unifiedMessage.message.alert = "Test push message";
-            unifiedMessage.pushApplicationId = "appId";
-            unifiedMessage.masterSecret = "secret";
             SenderClient client = new SenderClient(mock.Object);
 
             //when
