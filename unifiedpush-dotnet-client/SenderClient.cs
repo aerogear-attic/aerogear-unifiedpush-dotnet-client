@@ -26,6 +26,22 @@ namespace AeroGear
         public Uri endpoint {get; set;}
         public string pushApplicationId { get; set; }
         public string masterSecret { get; set; }
+        public ProxyConfig proxyConfig
+        {
+            get
+            {
+                if (proxyConfig == null)
+                {
+                    proxyConfig = new ProxyConfig();
+                }
+                return proxyConfig;
+            }
+            set
+            {
+                proxyConfig = value;
+            }
+
+        }
 
         public Builder(Uri endpoint)
         {
@@ -55,6 +71,24 @@ namespace AeroGear
         public Builder setMasterSecret(string masterSecret)
         {
             this.masterSecret = masterSecret;
+            return this;
+        }
+
+        public Builder proxy(Uri proxyUri)
+        {
+            proxyConfig.uri = proxyUri;
+            return this;
+        }
+
+        public Builder proxyUser(String proxyUser)
+        {
+            proxyConfig.user = proxyUser;
+            return this;
+        }
+
+        public Builder proxyPassword(String proxyPassword)
+        {
+            proxyConfig.password = proxyPassword;
             return this;
         }
 

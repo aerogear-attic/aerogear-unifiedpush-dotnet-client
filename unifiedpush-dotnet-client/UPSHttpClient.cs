@@ -22,6 +22,21 @@ namespace AeroGear
             request.Method = "POST";
         }
 
+        public UPSHttpClient(Uri uri, ProxyConfig config) : this(uri)
+        {
+            if (config != null)
+            {
+                WebProxy proxy = new WebProxy();
+                if (config.user != null)
+                {
+                    proxy.Credentials = new NetworkCredential(config.user, config.password);
+                }
+
+                proxy.Address = config.uri;
+                request.Proxy = proxy;
+            }
+        }
+
         public UPSHttpClient(Uri uri, string username, string password) : this(uri)
         {
             setUsernamePassword(username, password);
