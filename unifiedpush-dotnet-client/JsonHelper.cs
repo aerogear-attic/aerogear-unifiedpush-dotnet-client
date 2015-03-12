@@ -26,7 +26,9 @@ namespace AeroGear
                 return "null";
             }
 
-            DataContractJsonSerializer ser = new DataContractJsonSerializer(obj.GetType());
+            DataContractJsonSerializerSettings settings = new DataContractJsonSerializerSettings();
+            settings.UseSimpleDictionaryFormat = true;
+            DataContractJsonSerializer ser = new DataContractJsonSerializer(obj.GetType(), settings);
 
             MemoryStream ms = new MemoryStream();
             ser.WriteObject(ms, obj);
