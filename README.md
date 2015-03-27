@@ -1,6 +1,8 @@
 unifiedpush-dotnet-client
 =========================
 
+[![Build status](https://ci.appveyor.com/api/projects/status/dljwr39k4jco3qrk?svg=true)](https://ci.appveyor.com/project/edewit/aerogear-unifiedpush-dotnet-client)
+
 A .Net client for sending Push Notifications to the [AeroGear UnifiedPush Server](https://github.com/aerogear/aerogear-unifiedpush-server)
 
 |                 | Project Info  |
