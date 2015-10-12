@@ -1,5 +1,27 @@
 version: 1.0.{build}
+environment:
+  COVERALLS_REPO_TOKEN:
+    secure: dhAjH+2TJfUsrx5fxO4EB48Ox72GcNp8RZV+KI4yrXOAMJGR+jvMcb/PDDGtz/mf
 before_build:
 - nuget restore
 build:
   verbosity: minimal
+test_script:
+- ps: >-
+    ."C:\Program Files (x86)\Microsoft Visual Studio 12.0\Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe" /inIsolation /Enablecodecoverage tests\bin\Debug\tests.dll /Settings:CodeCoverage.runsettings
+
+    $coverageFilePath = Resolve-Path -path "TestResults\*\*.coverage"
+
+    $coverageFilePath = $coverageFilePath.ToString()
+
+    if(Test-Path .\coverage.coveragexml){ rm .\coverage.coveragexml }
+
+    ."C:\Program Files (x86)\Microsoft Visual Studio 12.0\Team Tools\Dynamic Code Coverage Tools\CodeCoverage.exe" analyze /output:coverage.coveragexml "$coverageFilePath"
+
+    Push-AppveyorArtifact coverage.coveragexml
+
+    $coveralls = (Resolve-Path "packages/coveralls.net.*/tools/csmacnz.coveralls.exe").ToString()
+
+    & $coveralls --dynamiccodecoverage -i coverage.coveragexml --repoToken $env:COVERALLS_REPO_TOKEN --useRelativePaths -o cov.json
+
+    Push-AppveyorArtifact cov.json
