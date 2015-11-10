@@ -14,43 +14,41 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 using System;
 using System.IO;
 using System.Net;
-using System.Runtime.Serialization.Json;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace AeroGear
 {
-    public sealed class UPSHttpClient: HttpClient
+    public sealed class UPSHttpClient : HttpClient
     {
-        private const string AUTHORIZATION_HEADER = "Authorization";
-        private const string AUTHORIZATION_METHOD = "Basic";
-        private const string SENDER_ENDPOINT = "rest/sender/";
+        private const string AuthorizationHeader = "Authorization";
+        private const string AuthorizationMethod = "Basic";
+        private const string SenderEndpoint = "rest/sender/";
 
-        private HttpWebRequest request;
+        internal readonly HttpWebRequest _request;
 
         public UPSHttpClient(Uri uri)
         {
-            request = (HttpWebRequest)WebRequest.Create(new Uri(uri, SENDER_ENDPOINT));
-            request.ContentType = "application/json";
-            request.Method = "POST";
+            _request = (HttpWebRequest) WebRequest.Create(new Uri(uri, SenderEndpoint));
+            _request.ContentType = "application/json";
+            _request.Method = "POST";
         }
 
         public UPSHttpClient(Uri uri, ProxyConfig config) : this(uri)
         {
-            if (config != null)
+            if (config == null) return;
+            var proxy = new WebProxy();
+            if (config.user != null)
             {
-                WebProxy proxy = new WebProxy();
-                if (config.user != null)
-                {
-                    proxy.Credentials = new NetworkCredential(config.user, config.password);
-                }
-
-                proxy.Address = config.uri;
-                request.Proxy = proxy;
+                proxy.Credentials = new NetworkCredential(config.user, config.password);
             }
+
+            proxy.Address = config.uri;
+            _request.Proxy = proxy;
         }
 
         public UPSHttpClient(Uri uri, string username, string password) : this(uri)
@@ -60,28 +58,36 @@ namespace AeroGear
 
         public void setUsernamePassword(string username, string password)
         {
-            request.Headers[AUTHORIZATION_HEADER] = AUTHORIZATION_METHOD + " " + CreateHash(username, password);
+            _request.Headers[AuthorizationHeader] = AuthorizationMethod + " " + CreateHash(username, password);
         }
 
         public async Task<HttpStatusCode> Send(UnifiedMessage message)
         {
-            using (var postStream = await Task<Stream>.Factory.FromAsync(request.BeginGetRequestStream, request.EndGetRequestStream, request))
+            using (
+                var postStream =
+                    await
+                        Task<Stream>.Factory.FromAsync(_request.BeginGetRequestStream, _request.EndGetRequestStream,
+                            _request))
             {
-                byte[] bytes = Encoding.UTF8.GetBytes(message.Serialize());
+                var bytes = Encoding.UTF8.GetBytes(message.Serialize());
                 postStream.Write(bytes, 0, bytes.Length);
             }
 
-            HttpWebResponse responseObject = (HttpWebResponse)await Task<WebResponse>.Factory.FromAsync(request.BeginGetResponse, request.EndGetResponse, request);
+            var responseObject =
+                (HttpWebResponse)
+                    await Task<WebResponse>.Factory.FromAsync(_request.BeginGetResponse, _request.EndGetResponse, _request);
             var responseStream = responseObject.GetResponseStream();
-            var streamReader = new StreamReader(responseStream);
-
-            await streamReader.ReadToEndAsync();
+            if (responseStream != null)
+            {
+                var streamReader = new StreamReader(responseStream);
+                await streamReader.ReadToEndAsync();
+            }
             return responseObject.StatusCode;
         }
 
         private static string CreateHash(string username, string password)
         {
-            return Convert.ToBase64String(UTF8Encoding.UTF8.GetBytes(username + ":" + password));
+            return Convert.ToBase64String(Encoding.UTF8.GetBytes(username + ":" + password));
         }
     }
 }
