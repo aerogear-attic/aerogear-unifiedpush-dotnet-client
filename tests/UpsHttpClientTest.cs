@@ -14,32 +14,45 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+using System;
 using AeroGear;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Moq;
-using System.Net;
-using System.Threading.Tasks;
 
 namespace tests
 {
     [TestClass]
-    public class SenderClientTest
+    public class UpsHttpClientTest
     {
         [TestMethod]
-        public async Task SentMessage()
+        public void ShouldSetAuthorizationHeader()
         {
-            //given
-            var mock = new Mock<HttpClient>();
-            UnifiedMessage unifiedMessage = new UnifiedMessage();
-            unifiedMessage.message.alert = "Test push message";
-            SenderClient client = new SenderClient(mock.Object);
-
             //when
-            mock.Setup(httpClient => httpClient.Send(unifiedMessage)).ReturnsAsync(HttpStatusCode.OK);
-            await client.Send(unifiedMessage);
+            var upsClient = new UPSHttpClient(new Uri("http://localhost"), "user", "pass");
 
             //then
-            mock.Verify();
+            var request = upsClient._request;
+            Assert.AreEqual("localhost", request.Host);
+            Assert.AreEqual("Basic dXNlcjpwYXNz", request.Headers["Authorization"]);
         }
+
+        [TestMethod]
+        public void ShouldSetProxy()
+        {
+            //given
+            var proxy = new Uri("http://proxy");
+
+            //when
+            var upsClient = new UPSHttpClient(new Uri("http://localhost"), new ProxyConfig()
+            {
+                password = "pass",
+                user = "user",
+                uri = proxy
+            });
+
+            //then
+            var request = upsClient._request;
+            Assert.AreEqual(proxy, request.Proxy.GetProxy(proxy));
+        }
+
     }
 }
