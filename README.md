@@ -17,6 +17,13 @@ A .Net client for sending Push Notifications to the [AeroGear UnifiedPush Server
 
 ## Documentation
 
+```csharp
+var client = Builder.Endpoint(new Uri("http://localhost"))
+              .setMasterSecret("123").setPushApplicationId("123").build();
+var message = new UnifiedMessage {message = {alert = "Send push notification"}};
+await client.Send(message);
+```
+
 For more details about the current release, please consult [our documentation](https://aerogear.org/docs/unifiedpush/).
 
 ## Development
